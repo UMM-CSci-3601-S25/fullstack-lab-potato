@@ -3,21 +3,22 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { User, UserRole } from './user';
+import { Todo } from './todo';
 import { Company } from '../company-list/company';
 
 /**
  * Service that provides the interface for getting information
- * about `Users` from the server.
+ * about `Todos` from the server.
  */
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class TodoService {
   // The URL for the users part of the server API.
-  readonly userUrl: string = `${environment.apiUrl}users`;
+  readonly userUrl: string = `${environment.apiUrl}todos`;
 
 private readonly statusKey = 'status';
+private readonly bodyKey = 'body';
 
   // The private `HttpClient` is *injected* into the service
   // by the Angular framework. This allows the system to create
@@ -33,49 +34,58 @@ private readonly statusKey = 'status';
    * Get all the users from the server, filtered by the information
    * in the `filters` map.
    *
-   * It would be more consistent with `UserListComponent` if this
+   * It would be more consistent with `TodoListComponent` if this
    * only supported filtering on age and role, and left company to
-   * just be in `filterUsers()` below. We've included it here, though,
+   * just be in `filterTodos()` below. We've included it here, though,
    * to provide some additional examples.
    *
    * @param filters a map that allows us to specify a target role, age,
    *  or company to filter by, or any combination of those
-   * @returns an `Observable` of an array of `Users`. Wrapping the array
+   * @returns an `Observable` of an array of `Todos`. Wrapping the array
    *  in an `Observable` means that other bits of of code can `subscribe` to
    *  the result (the `Observable`) and get the results that come back
    *  from the server after a possibly substantial delay (because we're
    *  contacting a remote server over the Internet).
    */
-  getUsers(filters?: { status?: string }): Observable<User[]> {
+  getTodos(filters?: { status?: boolean; body?: string; category?: string; owner?: string }): Observable<Todo[]> {
     // `HttpParams` is essentially just a map used to hold key-value
     // pairs that are then encoded as "?key1=value1&key2=value2&…" in
     // the URL when we make the call to `.get()` below.
     let httpParams: HttpParams = new HttpParams();
     if (filters) {
+      if (filters.owner) {
+        httpParams = httpParams.set(this.bodyKey, filters.owner);
+      }
+      if (filters.category) {
+        httpParams = httpParams.set(this.bodyKey, filters.category);
+      }
+      if (filters.body) {
+        httpParams = httpParams.set(this.bodyKey, filters.body);
+      }
       if (filters.status) {
         httpParams = httpParams.set(this.statusKey, filters.status);
       }
     }
     // Send the HTTP GET request with the given URL and parameters.
-    // That will return the desired `Observable<User[]>`.
-    return this.httpClient.get<User[]>(this.userUrl, {
+    // That will return the desired `Observable<Todo[]>`.
+    return this.httpClient.get<Todo[]>(this.userUrl, {
       params: httpParams,
     });
   }
 
   /**
-   * Get the `User` with the specified ID.
+   * Get the `Todo` with the specified ID.
    *
    * @param id the ID of the desired user
    * @returns an `Observable` containing the resulting user.
    */
-  getUserById(id: string): Observable<User> {
+  getTodoById(id: string): Observable<Todo> {
     // The input to get could also be written as (this.userUrl + '/' + id)
-    return this.httpClient.get<User>(`${this.userUrl}/${id}`);
+    return this.httpClient.get<Todo>(`${this.userUrl}/${id}`);
   }
 
   /**
-   * A service method that filters an array of `User` using
+   * A service method that filters an array of `Todo` using
    * the specified filters.
    *
    * Note that the filters here support partial matches. Since the
@@ -83,35 +93,36 @@ private readonly statusKey = 'status';
    * partial matches instead of waiting until we have a full string
    * to match against.
    *
-   * @param users the array of `Users` that we're filtering
+   * @param todos the array of `Todos` that we're filtering
    * @param filters the map of key-value pairs used for the filtering
-   * @returns an array of `Users` matching the given filters
+   * @returns an array of `Todos` matching the given filters
    */
-  filterUsers(users: User[], filters: { name?: string; company?: string }): User[] { // skipcq: JS-0105
-    let filteredUsers = users;
+  filterTodos(todos: Todo[], filters: { owner?: string; category?: string; status?: boolean }): Todo[] { // skipcq: JS-0105
+    let filteredTodos = todos;
 
     // Filter by name
-    if (filters.name) {
-      filters.name = filters.name.toLowerCase();
-      filteredUsers = filteredUsers.filter(user => user.name.toLowerCase().indexOf(filters.name) !== -1);
+    if (filters.owner) {
+      filters.owner = filters.owner.toLowerCase();
+      filteredTodos = filteredTodos.filter(todo => todo.owner.toLowerCase().indexOf(filters.owner) !== -1);
     }
 
     // Filter by company
-    if (filters.company) {
-      filters.company = filters.company.toLowerCase();
-      filteredUsers = filteredUsers.filter(user => user.company.toLowerCase().indexOf(filters.company) !== -1);
+    if (filters.category) {
+      filters.category = filters.category.toLowerCase();
+      filteredTodos = filteredTodos.filter(todo => todo.category.toLowerCase().indexOf(filters.category) !== -1);
     }
 
-    return filteredUsers;
+
+    return filteredTodos;
   }
 
   getCompanies(): Observable<Company[]> {
     return this.httpClient.get<Company[]>(`${environment.apiUrl}usersByCompany`);
   }
 
-  addUser(newUser: Partial<User>): Observable<string> {
+  addTodo(newTodo: Partial<Todo>): Observable<string> {
     // Send post request to add a new user with the user data as the body.
-    // `res.id` should be the MongoDB ID of the newly added `User`.
-    return this.httpClient.post<{id: string}>(this.userUrl, newUser).pipe(map(response => response.id));
+    // `res.id` should be the MongoDB ID of the newly added `Todo`.
+    return this.httpClient.post<{id: string}>(this.userUrl, newTodo).pipe(map(response => response.id));
   }
 }
