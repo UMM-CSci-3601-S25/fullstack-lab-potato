@@ -5,7 +5,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { catchError, map, switchMap } from 'rxjs/operators';
 // import { User } from './user';
 import { UserCardComponent } from './todo-card.component';
-import { UserService } from './user.service';
+import { UserService } from './todo.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 // import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

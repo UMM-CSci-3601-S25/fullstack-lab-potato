@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { User } from './user';
-import { UserService } from './user.service';
+import { UserService } from './todo.service';
 
 describe('UserService', () => {
   // A small collection of test users

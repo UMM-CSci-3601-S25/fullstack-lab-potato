@@ -17,9 +17,7 @@ export class UserService {
   // The URL for the users part of the server API.
   readonly userUrl: string = `${environment.apiUrl}users`;
 
-  private readonly roleKey = 'role';
-  private readonly ageKey = 'age';
-  private readonly companyKey = 'company';
+private readonly statusKey = 'status';
 
   // The private `HttpClient` is *injected* into the service
   // by the Angular framework. This allows the system to create
@@ -48,20 +46,14 @@ export class UserService {
    *  from the server after a possibly substantial delay (because we're
    *  contacting a remote server over the Internet).
    */
-  getUsers(filters?: { role?: UserRole; age?: number; company?: string }): Observable<User[]> {
+  getUsers(filters?: { status?: string }): Observable<User[]> {
     // `HttpParams` is essentially just a map used to hold key-value
     // pairs that are then encoded as "?key1=value1&key2=value2&…" in
     // the URL when we make the call to `.get()` below.
     let httpParams: HttpParams = new HttpParams();
     if (filters) {
-      if (filters.role) {
-        httpParams = httpParams.set(this.roleKey, filters.role);
-      }
-      if (filters.age) {
-        httpParams = httpParams.set(this.ageKey, filters.age.toString());
-      }
-      if (filters.company) {
-        httpParams = httpParams.set(this.companyKey, filters.company);
+      if (filters.status) {
+        httpParams = httpParams.set(this.statusKey, filters.status);
       }
     }
     // Send the HTTP GET request with the given URL and parameters.
