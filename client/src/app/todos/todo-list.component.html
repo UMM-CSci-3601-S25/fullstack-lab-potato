@@ -1,0 +1,19 @@
+<p>todo-list works!</p>
+<div data-test="todo-list-title">Todos</div>
+<div class="flex-row">
+  @if (todos()) {
+    <ol>
+    <div class="todo-cards-container flex-row gap-8 flex-wrap">
+      @for (todo of todos(); track todo._id) {
+        <li data-test="todo">{{ todo.owner }}
+          <ul>
+            <li>Completed? {{ todo.status }} </li>
+            <li>Category: {{ todo.category }} </li>
+            <li>Description: {{todo.body}} </li>
+          </ul>
+        </li>
+      }
+    </div>
+    </ol>
+  }
+</div>
