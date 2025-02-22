@@ -2,7 +2,8 @@ import { TodoCategory } from 'src/app/todos/todo';
 
 export class TodoListPage {
   private readonly baseUrl = '/todos';
-  private readonly pageTitle = '.todo-list-title';
+  private readonly pageTitle = '[data-test=todo-list-title]';
+  private readonly todo = '[data-test=todo]';
   private readonly todoCardSelector = '.todo-cards-container app-todo-card';
   private readonly todoListItemsSelector = '.todo-nav-list .todo-list-item';
   private readonly profileButtonSelector = '[data-test=viewProfileButton]';
@@ -32,7 +33,7 @@ export class TodoListPage {
    *   the `app-todo-card` DOM elements.
    */
    getTodoCards() {
-    return cy.get(this.todoCardSelector);
+    return cy.get(this.todo);
   }
 
   /**

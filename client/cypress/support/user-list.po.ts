@@ -2,7 +2,7 @@ import { UserRole } from 'src/app/users/user';
 
 export class UserListPage {
   private readonly baseUrl = '/users';
-  private readonly pageTitle = '.GRAAAAAAAAAAAAAAAAAAAAAAAAAaa-list-title';
+  private readonly pageTitle = '.user-list-title';
   private readonly userCardSelector = '.user-cards-container app-user-card';
   private readonly userListItemsSelector = '.user-nav-list .user-list-item';
   private readonly profileButtonSelector = '[data-test=viewProfileButton]';

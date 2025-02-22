@@ -1,11 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TodoService } from './todo.service';
+import { Todo } from './todo';
 
 @Component({
-  selector: 'app-user-list',
+  selector: 'app-todo-list',
   imports: [],
-  templateUrl: './user-list.component.html',
-  styleUrl: './user-list.component.scss'
+  templateUrl: './todo-list.component.html',
+  styleUrl: './todo-list.component.scss'
 })
-export class UserListComponent {
+export class TodoListComponent {
+  /**
+    * This constructor injects instance of `UserService`
+    * into this component.
+    * `UserService` lets us interact with the server.
+    *
+    * @param todoService the `UserService` used to get users from the server
+    */
+    constructor(private todoService: TodoService) {
+      // Nothing here – everything is in the injection parameters.
+    }
+
+    todos: Signal<Todo[]> = toSignal(this.todoService.getTodos());
 
 }
