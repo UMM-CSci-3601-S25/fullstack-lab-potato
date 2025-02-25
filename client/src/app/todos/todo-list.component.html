@@ -1,8 +1,9 @@
-<p>todo-list works!</p>
 <mat-form-field class="input-field">
   <mat-label>Status</mat-label>
-  <input matInput data-test="todoStatusFilter" type="string" placeholder="Filter by status"
-    min="0" max="200" [(ngModel)]="todoStatus" >
+  <mat-select [(ngModel)]="todoStatus" data-test="todoStatusFilter">
+      <mat-option value="complete">Complete</mat-option>
+      <mat-option value="incomplete">Incomplete</mat-option>
+  </mat-select>
   <mat-hint>Filtered on server</mat-hint>
 </mat-form-field>
 <div data-test="todoListTitle">Todos</div>

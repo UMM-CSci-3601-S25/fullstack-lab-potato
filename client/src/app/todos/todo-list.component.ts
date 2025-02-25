@@ -6,6 +6,7 @@ import { MatFormField, MatHint, MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TodoService } from './todo.service';
 import { Todo } from './todo';
+import { MatOption, MatSelect } from '@angular/material/select';
 
 @Component({
   selector: 'app-todo-list',
@@ -13,7 +14,9 @@ import { Todo } from './todo';
     MatFormField,
     MatHint,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    MatSelect,
+    MatOption
   ],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.scss'
