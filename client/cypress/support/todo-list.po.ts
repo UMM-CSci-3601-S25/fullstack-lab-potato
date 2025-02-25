@@ -2,8 +2,10 @@ import { TodoCategory } from 'src/app/todos/todo';
 
 export class TodoListPage {
   private readonly baseUrl = '/todos';
-  private readonly pageTitle = '[data-test=todo-list-title]';
+  private readonly pageTitle = '[data-test=todoListTitle]';
   private readonly todo = '[data-test=todo]';
+  private readonly todoowner = '[data-test=todoOwner]';
+  private readonly statusFilter = '[data-test=todoStatusFilter]';
   private readonly todoCardSelector = '.todo-cards-container app-todo-card';
   private readonly todoListItemsSelector = '.todo-nav-list .todo-list-item';
   private readonly profileButtonSelector = '[data-test=viewProfileButton]';
@@ -34,6 +36,14 @@ export class TodoListPage {
    */
    getTodoCards() {
     return cy.get(this.todo);
+  }
+
+  getTodoOwner() {
+    return cy.get(this.todoowner);
+  }
+
+  filterByStatus(status: string) {
+    return cy.get(this.statusFilter).type(status.toString());
   }
 
   /**
