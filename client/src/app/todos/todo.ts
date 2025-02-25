@@ -5,5 +5,5 @@ export interface Todo {
   body: string;
   status: boolean;
 }
-
+export type TodoStatus = 'complete' | 'incomplete'
 export type TodoCategory = 'video games' | 'groceries' | 'homework' | 'software design';

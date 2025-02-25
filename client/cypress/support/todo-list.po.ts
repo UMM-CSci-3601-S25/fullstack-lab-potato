@@ -38,12 +38,11 @@ export class TodoListPage {
     return cy.get(this.todo);
   }
 
-  getTodoOwner() {
-    return cy.get(this.todoowner);
-  }
 
   filterByStatus(status: string) {
-    return cy.get(this.statusFilter).type(status.toString());
+    cy.get(this.statusFilter).click().then(() => {
+      return cy.get(`[value="${status}"]`).click();
+    })
   }
 
   /**
