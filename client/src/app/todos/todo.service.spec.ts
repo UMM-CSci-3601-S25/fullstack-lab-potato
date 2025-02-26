@@ -136,5 +136,15 @@ describe('TodoService', () => {
           .toHaveBeenCalledWith(todoService.todoUrl, { params: new HttpParams().set('status', 'complete') });
       });
     });
+    it('correctly calls api/todos with filter parameter \'owner\'', () => {
+      const todoOwner = 'Blanche';
+      const filteredTodos = todoService.filterTodos(testTodos, { owner: todoOwner });
+
+      expect(filteredTodos.length).toBe(1);
+      // Every returned user's name should contain an 'i'.
+      filteredTodos.forEach(todo => {
+        expect(todo.owner.indexOf(todoOwner)).toBeGreaterThanOrEqual(0);
+      });
+    });
   });
 })

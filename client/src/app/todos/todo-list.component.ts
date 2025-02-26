@@ -23,6 +23,7 @@ import { MatOption, MatSelect } from '@angular/material/select';
 })
 export class TodoListComponent {
   todoStatus = signal<string | undefined>(undefined);
+  todoOwner = signal<string | undefined>(undefined);
 
   errMsg = signal<string | undefined>(undefined);
   /**
@@ -88,6 +89,7 @@ export class TodoListComponent {
     // will be updated by rerunning the function we're passing to `computed()`.
     filteredTodos = computed(() => {
       const serverFilteredTodos = this.serverFilteredTodos();
-      return this.todoService.filterTodos(serverFilteredTodos, {});
+      return this.todoService.filterTodos(serverFilteredTodos,
+        {owner: this.todoOwner(),});
     });
   }

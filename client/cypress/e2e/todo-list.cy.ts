@@ -31,4 +31,20 @@ describe('Todo list', () => {
     page.getTodoCards().should('have.lengthOf', 157);
 
   });
+
+  it('Should be able to filter out owners', () => {
+    // Filter for users of age '27'
+    page.filterByOwner("barry");
+
+    page.getTodoCards().should('have.lengthOf', 51);
+
+    page.getTodoOwners().each(owner => {
+      cy.wrap(owner).should('have.text', 'Barry');
+    });
+
+    page.getTodoOwners().each(owner =>
+      expect(owner.text()).to.equal('Barry')
+    );
+  });
+
 });
