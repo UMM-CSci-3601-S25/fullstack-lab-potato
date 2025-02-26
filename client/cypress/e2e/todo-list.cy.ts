@@ -52,6 +52,14 @@ describe('Todo list', () => {
 
   });
 
+  it('Should be able to limit the number of todos returned', () => {
+
+    page.filterByLimit(10);
+
+    page.getTodoCards().should('have.lengthOf', 10);
+
+  });
+
   it('Should be able to filter out bodies by keywords', () => {
     // Filter for users of age '27'
     page.filterByBody("Nostrud");

@@ -6,6 +6,7 @@ export class TodoListPage {
   private readonly todo = '[data-test=todo]';
   private readonly owner = '[data-test=todoOwner]';
   private readonly body = '[data-test=todoBody]';
+  private readonly limitFilter = '[data-test=todoLimitFilter]';
   private readonly statusFilter = '[data-test=todoStatusFilter]';
   private readonly categoryFilter = '[data-test=todoCategoryFilter]';
   private readonly ownerFilter = '[data-test=todoOwnerFilter]';
@@ -64,6 +65,11 @@ export class TodoListPage {
     cy.get(this.categoryFilter).click().then(() => {
       return cy.get(`[value="${category}"]`).click();
     })
+  }
+
+  filterByLimit(limit: number)
+  {
+    cy.get(this.limitFilter).type(limit.toString());
   }
 
   filterByOwner(owner: string) {

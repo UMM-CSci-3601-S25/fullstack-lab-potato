@@ -26,6 +26,7 @@ export class TodoListComponent {
   todoOwner = signal<string | undefined>(undefined);
   todoBody = signal<string | undefined>(undefined);
   todoCategory = signal<string | undefined>(undefined);
+  todoLimit = signal<number | undefined>(undefined);
 
   errMsg = signal<string | undefined>(undefined);
   /**
@@ -40,6 +41,7 @@ export class TodoListComponent {
     }
     private todoStatus$ = toObservable(this.todoStatus);
     private todoCategory$ = toObservable(this.todoCategory);
+    private todoLimit$ = toObservable(this.todoLimit);
 
     // We ultimately `toSignal` this to be able to access it synchronously, but we do all the RXJS operations
     // "inside" the `toSignal()` call processing and transforming the observables there.
@@ -50,13 +52,13 @@ export class TodoListComponent {
       // the corresponding `todoRole$` and/or `todoAge$` observables to change, which will cause `combineLatest()`
       // to send a new pair down the pipe.
       toSignal(
-        combineLatest([this.todoStatus$, this.todoCategory$]).pipe(
+        combineLatest([this.todoStatus$, this.todoCategory$, this.todoLimit$]).pipe(
           // `switchMap` maps from one observable to another. In this case, we're taking `role` and `status` and passing
           // them as arguments to `todoService.getTodos()`, which then returns a new observable that contains the
           // results.
-          switchMap(([ status, category ]) =>
+          switchMap(([ status, category, limit ]) =>
             this.todoService.getTodos({
-              status, category
+              status, category, limit
             })
           ),
           // `catchError` is used to handle errors that might occur in the pipeline. In this case `todoService.getTodos()`

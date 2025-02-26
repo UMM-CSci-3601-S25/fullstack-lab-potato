@@ -148,6 +148,19 @@ describe('TodoService', () => {
           .toHaveBeenCalledWith(todoService.todoUrl, { params: new HttpParams().set('category', 'video games') });
       });
     });
+    it('correctly calls api/todos with filter parameter \'limit\'', () => {
+      const mockedMethod = spyOn(httpClient, 'get').and.returnValue(of(testTodos));
+
+      todoService.getTodos({ limit: 20 }).subscribe(() => {
+        expect(mockedMethod)
+          .withContext('one call')
+          .toHaveBeenCalledTimes(1);
+          expect(mockedMethod)
+          .withContext('talks to the correct endpoint')
+          .toHaveBeenCalledWith(todoService.todoUrl, { params: new HttpParams().set('limit', '20') });
+
+      });
+    });
     it('correctly calls api/todos with filter parameter \'owner\'', () => {
       const todoOwner = 'Blanche';
       const filteredTodos = todoService.filterTodos(testTodos, { owner: todoOwner });
