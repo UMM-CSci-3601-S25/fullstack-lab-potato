@@ -32,6 +32,17 @@ describe('Todo list', () => {
 
   });
 
+  it('Should be able to filter out bodies by keywords', () => {
+    // Filter for users of age '27'
+    page.filterByBody("Nostrud");
+
+    page.getTodoCards().should('have.lengthOf', 90);
+
+    page.getTodoBodies().each(body => {
+      cy.wrap(body).contains('div', /Nostrud|nostrud/)
+    });
+  });
+
   it('Should be able to filter out owners', () => {
     // Filter for users of age '27'
     page.filterByOwner("barry");
@@ -46,5 +57,7 @@ describe('Todo list', () => {
       expect(owner.text()).to.equal('Barry')
     );
   });
+
+
 
 });

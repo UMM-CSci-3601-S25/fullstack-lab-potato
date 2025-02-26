@@ -15,7 +15,6 @@ export class TodoService {
   // The URL for the users part of the server API.
   readonly todoUrl: string = `${environment.apiUrl}todos`;
   private readonly statusKey = 'status';
-  private readonly ownerKey = 'owner';
 
   // The private `HttpClient` is *injected* into the service
   // by the Angular framework. This allows the system to create
@@ -40,7 +39,7 @@ export class TodoService {
   *  from the server after a possibly substantial delay (because we're
   *  contacting a remote server over the Internet).
   */
-  getTodos(filters?: {status?: string; owner?: string}): Observable<Todo[]> {
+  getTodos(filters?: {status?: string}): Observable<Todo[]> {
     // `HttpParams` is essentially just a map used to hold key-value
     // pairs that are then encoded as "?key1=value1&key2=value2&…" in
     // the URL when we make the call to `.get()` below.
@@ -57,13 +56,18 @@ export class TodoService {
     });
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  filterTodos(todos: Todo[], filters: { owner?: string }): Todo[] { // skipcq: JS-0105
+  filterTodos(todos: Todo[], filters: { owner?: string, body?: string }): Todo[] { // skipcq: JS-0105
     let filteredTodos = todos;
 
     // Filter by name
     if (filters.owner) {
       filters.owner = filters.owner.toLowerCase();
       filteredTodos = filteredTodos.filter(todo => todo.owner.toLowerCase().indexOf(filters.owner) != -1);
+    }
+
+    if (filters.body) {
+      filters.body = filters.body.toLowerCase();
+      filteredTodos = filteredTodos.filter(todo => todo.body.toLowerCase().indexOf(filters.body) != -1);
     }
     return filteredTodos;
   }
