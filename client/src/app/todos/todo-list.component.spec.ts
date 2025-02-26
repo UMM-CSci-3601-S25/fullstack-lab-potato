@@ -35,7 +35,7 @@ describe('Todo List', () => {
   });
 
   it('contains all the todos', () => {
-    expect(todoList.serverFilteredTodos().length).toBe(3);
+    expect(todoList.serverFilteredTodos().length).toBe(5);
   });
 
   });

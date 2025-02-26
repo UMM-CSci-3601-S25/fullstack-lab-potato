@@ -34,7 +34,22 @@ export class MockTodoService extends TodoService {
       status: false,
       body: "Id dolor culpa quis dolore elit sunt dolore. Amet adipisicing duis aliquip deserunt ut fugiat dolore.",
       category: "software design"
+    },
+    {
+      _id: 'Dawn_ID2',
+      owner: 'Dawn',
+      status: false,
+      body: "I am Mrs.Potato!",
+      category: "software design"
+    },
+    {
+      _id: 'Blanche_ID2',
+      owner: 'Blanche',
+      status: false,
+      body: "Id dolor culpa quis dolore elit sunt dolore. Amet adipisicing duis aliquip deserunt ut fugiat dolore.",
+      category: "software design"
     }
+
   ];
 
   constructor() {

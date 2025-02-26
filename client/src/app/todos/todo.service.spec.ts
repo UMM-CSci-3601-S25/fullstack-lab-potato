@@ -29,7 +29,22 @@ describe('TodoService', () => {
       status: false,
       body: "Id dolor culpa quis dolore elit sunt dolore. Amet adipisicing duis aliquip deserunt ut fugiat dolore.",
       category: "software design"
+    },
+    {
+      _id: 'Dawn_ID2',
+      owner: 'Dawn',
+      status: false,
+      body: "I am Mrs.Potato!",
+      category: "software design"
+    },
+    {
+      _id: 'Blanche_ID2',
+      owner: 'Blanche',
+      status: false,
+      body: "Id dolor culpa quis dolore elit sunt dolore. Amet adipisicing duis aliquip deserunt ut fugiat dolore.",
+      category: "software design"
     }
+
   ];
   let todoService: TodoService;
   // These are used to mock the HTTP requests so that we (a) don't have to
@@ -178,7 +193,7 @@ describe('TodoService', () => {
       const todoOwner = 'Blanche';
       const filteredTodos = todoService.filterTodos(testTodos, { owner: todoOwner });
 
-      expect(filteredTodos.length).toBe(1);
+      expect(filteredTodos.length).toBe(2);
       // Every returned user's name should contain an 'i'.
       filteredTodos.forEach(todo => {
         expect(todo.owner.indexOf(todoOwner)).toBeGreaterThanOrEqual(0);
@@ -191,6 +206,18 @@ describe('TodoService', () => {
       expect(filteredTodos.length).toBe(1);
       // Every returned user's name should contain an 'i'.
       filteredTodos.forEach(todo => {
+        expect(todo.body.indexOf(todoBody)).toBeGreaterThanOrEqual(0);
+      });
+    });
+
+    it('filters by owner and body', () => {
+      const todoOwner = 'Dawn';
+      const todoBody = 'Potato';
+      const filters = { body: todoBody, owner: todoOwner };
+      const filteredTodos = todoService.filterTodos(testTodos, filters);
+      expect(filteredTodos.length).toBe(1);
+      filteredTodos.forEach(todo => {
+        expect(todo.owner.indexOf(todoOwner)).toBeGreaterThanOrEqual(0);
         expect(todo.body.indexOf(todoBody)).toBeGreaterThanOrEqual(0);
       });
     });
