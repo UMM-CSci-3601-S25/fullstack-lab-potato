@@ -6,9 +6,10 @@ export class TodoListPage {
   private readonly todo = '[data-test=todo]';
   private readonly owner = '[data-test=todoOwner]';
   private readonly body = '[data-test=todoBody]';
-  private readonly limitFilter = '[data-test=todoLimitFilter]';
   private readonly statusFilter = '[data-test=todoStatusFilter]';
   private readonly categoryFilter = '[data-test=todoCategoryFilter]';
+  private readonly limitFilter = '[data-test=todoLimitFilter]';
+  private readonly sortByFilter = '[data-test=sortByFilter]';
   private readonly ownerFilter = '[data-test=todoOwnerFilter]';
   private readonly bodyFilter = '[data-test=todoBodyFilter]';
   private readonly todoCardSelector = '.todo-cards-container app-todo-card';
@@ -70,6 +71,13 @@ export class TodoListPage {
   filterByLimit(limit: number)
   {
     cy.get(this.limitFilter).type(limit.toString());
+  }
+
+  sortBy(sortBy: string)
+  {
+    cy.get(this.sortByFilter).click().then(() => {
+      return cy.get(`[value="${sortBy}"]`).click();
+    })
   }
 
   filterByOwner(owner: string) {

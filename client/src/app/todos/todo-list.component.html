@@ -36,6 +36,16 @@
     [(ngModel)]="todoLimit">
   <mat-hint>Filtered on server</mat-hint>
 </mat-form-field>
+<mat-form-field class="input-field">
+  <mat-label>Order By</mat-label>
+  <mat-select [(ngModel)]="todoSortBy" data-test="sortByFilter">
+      <mat-option value="owner">Owner (default)</mat-option>
+      <mat-option value="body">Description</mat-option>
+      <mat-option value="category">Category</mat-option>
+      <mat-option value="status">Status</mat-option>
+  </mat-select>
+  <mat-hint>Filtered on server</mat-hint>
+</mat-form-field>
 
 <div data-test="todoListTitle">Todos</div>
 <div class="flex-row">
