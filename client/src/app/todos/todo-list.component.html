@@ -56,8 +56,8 @@
         <li data-test="todo">
           <div data-test="todoOwner">{{ todo.owner }}</div>
           <ul>
-            <li>Completed? {{ todo.status }} </li>
-            <li>Category: {{ todo.category }} </li>
+            <li>Completed? <div data-test="todoStatus">{{ todo.status }}</div> </li>
+            <li>Category: <div data-test="todoCategory">{{ todo.category }}</div> </li>
             <li>Description: <div data-test="todoBody">{{todo.body}}</div> </li>
           </ul>
         </li>
