@@ -146,5 +146,15 @@ describe('TodoService', () => {
         expect(todo.owner.indexOf(todoOwner)).toBeGreaterThanOrEqual(0);
       });
     });
+    it('correctly calls api/todos with filter parameter \'owner\'', () => {
+      const todoBody = 'Excepteur';
+      const filteredTodos = todoService.filterTodos(testTodos, { body: todoBody });
+
+      expect(filteredTodos.length).toBe(1);
+      // Every returned user's name should contain an 'i'.
+      filteredTodos.forEach(todo => {
+        expect(todo.body.indexOf(todoBody)).toBeGreaterThanOrEqual(0);
+      });
+    });
   });
 })
