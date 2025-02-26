@@ -161,6 +161,19 @@ describe('TodoService', () => {
 
       });
     });
+    it('correctly calls api/todos with filter parameter \'orderBy\'', () => {
+      const mockedMethod = spyOn(httpClient, 'get').and.returnValue(of(testTodos));
+
+      todoService.getTodos({ sortBy: "owner" }).subscribe(() => {
+        expect(mockedMethod)
+          .withContext('one call')
+          .toHaveBeenCalledTimes(1);
+          expect(mockedMethod)
+          .withContext('talks to the correct endpoint')
+          .toHaveBeenCalledWith(todoService.todoUrl, { params: new HttpParams().set('orderBy', 'owner') });
+
+      });
+    });
     it('correctly calls api/todos with filter parameter \'owner\'', () => {
       const todoOwner = 'Blanche';
       const filteredTodos = todoService.filterTodos(testTodos, { owner: todoOwner });

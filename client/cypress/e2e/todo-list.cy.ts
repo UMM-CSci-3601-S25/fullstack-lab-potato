@@ -60,6 +60,18 @@ describe('Todo list', () => {
 
   });
 
+  it('Should be able to sort by the parameter given (alphabetically)', () => {
+
+    page.filterByLimit(2);
+
+    page.sortBy("category")
+
+    page.getTodoCards().should('have.lengthOf', 2);
+
+    page.getTodoOwners().should('contain.text', "Blanche").should('not.contain.text', "Dawn");
+
+  });
+
   it('Should be able to filter out bodies by keywords', () => {
     // Filter for users of age '27'
     page.filterByBody("Nostrud");
