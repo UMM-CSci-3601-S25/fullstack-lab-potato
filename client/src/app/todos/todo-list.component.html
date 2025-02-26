@@ -1,8 +1,20 @@
 <mat-form-field class="input-field">
   <mat-label>Status</mat-label>
   <mat-select [(ngModel)]="todoStatus" data-test="todoStatusFilter">
+      <mat-option value="">All</mat-option>
       <mat-option value="complete">Complete</mat-option>
       <mat-option value="incomplete">Incomplete</mat-option>
+  </mat-select>
+  <mat-hint>Filtered on server</mat-hint>
+</mat-form-field>
+<mat-form-field class="input-field">
+  <mat-label>Category</mat-label>
+  <mat-select [(ngModel)]="todoCategory" data-test="todoCategoryFilter">
+    <mat-option value="">All</mat-option>
+      <mat-option value="video games">Video Games</mat-option>
+      <mat-option value="groceries">Groceries</mat-option>
+      <mat-option value="homework">Homework</mat-option>
+      <mat-option value="software design">Software Design</mat-option>
   </mat-select>
   <mat-hint>Filtered on server</mat-hint>
 </mat-form-field>
