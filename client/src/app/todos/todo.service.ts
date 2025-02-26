@@ -57,13 +57,13 @@ export class TodoService {
     });
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  filterTodos(todos: Todo[], filters: { owner?: string; category?: string }): Todo[] { // skipcq: JS-0105
+  filterTodos(todos: Todo[], filters: { owner?: string }): Todo[] { // skipcq: JS-0105
     let filteredTodos = todos;
 
     // Filter by name
     if (filters.owner) {
       filters.owner = filters.owner.toLowerCase();
-      filteredTodos = filteredTodos.filter(todo => todo.owner.toLowerCase().indexOf(filters.owner) !== -1);
+      filteredTodos = filteredTodos.filter(todo => todo.owner.toLowerCase().indexOf(filters.owner) != -1);
     }
     return filteredTodos;
   }

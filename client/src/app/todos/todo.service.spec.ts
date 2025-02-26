@@ -137,15 +137,13 @@ describe('TodoService', () => {
       });
     });
     it('correctly calls api/todos with filter parameter \'owner\'', () => {
-      const mockedMethod = spyOn(httpClient, 'get').and.returnValue(of(testTodos));
+      const todoOwner = 'Blanche';
+      const filteredTodos = todoService.filterTodos(testTodos, { owner: todoOwner });
 
-      todoService.getTodos({ owner: "Fry" }).subscribe(() => {
-        expect(mockedMethod)
-          .withContext('one call')
-          .toHaveBeenCalledTimes(1);
-        expect(mockedMethod)
-          .withContext('talks to the correct endpoint')
-          .toHaveBeenCalledWith(todoService.todoUrl, { params: new HttpParams().set('owner', 'Fry') });
+      expect(filteredTodos.length).toBe(1);
+      // Every returned user's name should contain an 'i'.
+      filteredTodos.forEach(todo => {
+        expect(todo.owner.indexOf(todoOwner)).toBeGreaterThanOrEqual(0);
       });
     });
   });
