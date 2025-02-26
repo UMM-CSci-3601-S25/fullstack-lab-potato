@@ -15,6 +15,7 @@ export class TodoService {
   // The URL for the users part of the server API.
   readonly todoUrl: string = `${environment.apiUrl}todos`;
   private readonly statusKey = 'status';
+  private readonly categoryKey = 'category';
 
   // The private `HttpClient` is *injected* into the service
   // by the Angular framework. This allows the system to create
@@ -39,7 +40,7 @@ export class TodoService {
   *  from the server after a possibly substantial delay (because we're
   *  contacting a remote server over the Internet).
   */
-  getTodos(filters?: {status?: string}): Observable<Todo[]> {
+  getTodos(filters?: {status?: string, category?: string}): Observable<Todo[]> {
     // `HttpParams` is essentially just a map used to hold key-value
     // pairs that are then encoded as "?key1=value1&key2=value2&…" in
     // the URL when we make the call to `.get()` below.
@@ -49,6 +50,9 @@ export class TodoService {
     if (filters) {
       if (filters.status) {
         httpParams = httpParams.set(this.statusKey, filters.status.toString());
+      }
+      if (filters.category) {
+        httpParams = httpParams.set(this.categoryKey, filters.category.toString());
       }
     }
     return this.httpClient.get<Todo[]>(this.todoUrl, {

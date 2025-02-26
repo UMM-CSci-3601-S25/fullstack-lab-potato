@@ -32,6 +32,26 @@ describe('Todo list', () => {
 
   });
 
+  it('Should be able to filter out todos based on their category', () => {
+
+    page.filterByCategory("video games");
+
+    page.getTodoCards().should('have.lengthOf', 71);
+
+    page.filterByCategory("groceries");
+
+    page.getTodoCards().should('have.lengthOf', 76);
+
+    page.filterByCategory("homework");
+
+    page.getTodoCards().should('have.lengthOf', 79);
+
+    page.filterByCategory("software design");
+
+    page.getTodoCards().should('have.lengthOf', 74);
+
+  });
+
   it('Should be able to filter out bodies by keywords', () => {
     // Filter for users of age '27'
     page.filterByBody("Nostrud");
