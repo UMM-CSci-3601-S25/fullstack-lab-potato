@@ -98,6 +98,38 @@ describe('Todo list', () => {
     );
   });
 
+  it('Should possess the ability to combine every filter available', () =>
+  {
+    page.sortBy("category")
+
+    page.filterByLimit(30);
+    page.getTodoCards().should("have.lengthOf", 30);
+
+    page.filterByOwner("Dawn");
+
+    page.getTodoOwners().each(owner => {
+      cy.wrap(owner).should('have.text', 'Dawn');
+    });
+
+    page.filterByStatus("incomplete");
+
+    page.getTodoStatuses().each(status => {
+      cy.wrap(status).should('have.text', 'false');
+    });
+
+    page.filterByBody("Duis");
+
+    page.getTodoBodies().each(body => {
+      cy.wrap(body).contains('div', /Duis|duis/);
+    });
+
+    page.filterByCategory("groceries");
+
+    page.getTodoCategories().each(category => {
+      cy.wrap(category).should('have.text', 'groceries');
+    });
+  })
+
 
 
 });

@@ -6,6 +6,8 @@ export class TodoListPage {
   private readonly todo = '[data-test=todo]';
   private readonly owner = '[data-test=todoOwner]';
   private readonly body = '[data-test=todoBody]';
+  private readonly status = '[data-test=todoStatus]';
+  private readonly category = '[data-test=todoCategory]';
   private readonly statusFilter = '[data-test=todoStatusFilter]';
   private readonly categoryFilter = '[data-test=todoCategoryFilter]';
   private readonly limitFilter = '[data-test=todoLimitFilter]';
@@ -54,6 +56,15 @@ export class TodoListPage {
     return cy.get(this.body);
   }
 
+  getTodoStatuses()
+  {
+    return cy.get(this.status);
+  }
+
+  getTodoCategories()
+  {
+    return cy.get(this.category);
+  }
 
   filterByStatus(status: string) {
     cy.get(this.statusFilter).click().then(() => {
