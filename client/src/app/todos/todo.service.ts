@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Todo } from './todo';
 
@@ -64,11 +64,19 @@ export class TodoService {
         {
           httpParams = httpParams.set(this.sortByKey, filters.sortBy.toString());
         }
+
     }
+
     return this.httpClient.get<Todo[]>(this.todoUrl, {
       params: httpParams,
     });
+
   }
+
+   getTodosById(id: string): Observable<Todo> {
+      // The input to get could also be written as (this.userUrl + '/' + id)
+      return this.httpClient.get<Todo>(`${this.todoUrl}/${id}`);
+    }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   filterTodos(todos: Todo[], filters: { owner?: string, body?: string }): Todo[] { // skipcq: JS-0105
     let filteredTodos = todos;
@@ -85,4 +93,9 @@ export class TodoService {
     }
     return filteredTodos;
   }
+  addTodo(newTodo: Partial<Todo>): Observable<string> {
+      // Send post request to add a new user with the user data as the body.
+      // `res.id` should be the MongoDB ID of the newly added `User`.
+      return this.httpClient.post<{id: string}>(this.todoUrl, newTodo).pipe(map(response => response.id));
+    }
 }

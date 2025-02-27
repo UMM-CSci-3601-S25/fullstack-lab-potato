@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-todo-list',
@@ -24,7 +25,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatIconModule,
     MatTooltipModule,
     MatRadioModule,
-    MatButtonModule
+    MatButtonModule,
+    RouterLink,
   ],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.scss'

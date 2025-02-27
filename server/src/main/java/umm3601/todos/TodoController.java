@@ -6,7 +6,7 @@ import static com.mongodb.client.model.Filters.regex;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -40,6 +40,7 @@ public class TodoController implements Controller {
   public static final String OWNER_KEY = "owner";
   public static final String CATEGORY_KEY = "category";
   public static final String SORT_ORDER_KEY = "sortorder";
+  public static final String CATEGORY_REGEX = "^(video games|homework|category|software design)$";
   //private static final String CATEGORY_REGEX = "^(video games|homework|groceries|software design)$";
   private final JacksonMongoCollection<Todo> todoCollection;
 
@@ -145,6 +146,45 @@ public class TodoController implements Controller {
       //   .get();
       // filters.add(eq(CATEGORY_KEY, category));
 
+  public void addNewTodo(Context ctx) {
+    /*
+     * The follow chain of statements uses the Javalin validator system
+     * to verify that instance of `User` provided in this context is
+     * a "legal" user. It checks the following things (in order):
+     *    - The user has a value for the name (`usr.name != null`)
+     *    - The user name is not blank (`usr.name.length > 0`)
+     *    - The provided email is valid (matches EMAIL_REGEX)
+     *    - The provided age is > 0
+     *    - The provided age is < REASONABLE_AGE_LIMIT
+     *    - The provided role is valid (one of "admin", "editor", or "viewer")
+     *    - A non-blank company is provided
+     * If any of these checks fail, the Javalin system will throw a
+     * `BadRequestResponse` with an appropriate error message.
+     */
+    String body = ctx.body();
+    Todo newTodo = ctx.bodyValidator(Todo.class)
+      .check(todo -> todo.owner != null && todo.owner.length() > 0,
+        "Todo must have a non-empty owner name; body was " + body)
+      .check(todo -> todo.category.matches(CATEGORY_REGEX),
+        "Todo must have a legal user category; body was " + body)
+      .check(todo -> todo.body != null && todo.body.length() > 0,
+        "Todo must have a non-empty description; body was " + body)
+      .get();
+
+    // Add the new user to the database
+    todoCollection.insertOne(newTodo);
+
+    // Set the JSON response to be the `_id` of the newly created user.
+    // This gives the client the opportunity to know the ID of the new user,
+    // which it can then use to perform further operations (e.g., a GET request
+    // to get and display the details of the new user).
+    ctx.json(Map.of("id", newTodo._id));
+    // 201 (`HttpStatus.CREATED`) is the HTTP code for when we successfully
+    // create a new resource (a user in this case).
+    // See, e.g., https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+    // for a description of the various response codes.
+    ctx.status(HttpStatus.CREATED);
+  }
 
   private Bson constructSortingOrder(Context ctx) {
   // here we are specifying the order in which we want the return todos to be in
@@ -184,6 +224,8 @@ public class TodoController implements Controller {
 
     // List Todos, filtered using query parameters
     server.get(API_TODOS, this::getTodos);
+
+    server.post(API_TODOS, this::addNewTodo);
 
   }
 }

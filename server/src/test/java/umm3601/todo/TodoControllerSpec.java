@@ -12,13 +12,19 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import static com.mongodb.client.model.Filters.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -34,10 +40,14 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import io.javalin.http.NotFoundResponse;
+import io.javalin.json.JavalinJackson;
+import io.javalin.validation.BodyValidator;
 import io.javalin.validation.Validation;
+import io.javalin.validation.ValidationException;
 import io.javalin.validation.Validator;
 import umm3601.todos.Todo;
 import umm3601.todos.TodoController;
+import umm3601.user.UserController;
 
 /**
  * Tests the logic of the UserController
@@ -54,7 +64,7 @@ import umm3601.todos.TodoController;
 @SuppressWarnings({ "MagicNumber" })
 class TodoControllerSpec {
   private TodoController todoController;
-
+  private static JavalinJackson javalinJackson = new JavalinJackson();
   // An instance of the controller we're testing that is prepared in
   // `setupEach()`, and then exercised in the various tests below.
 
@@ -502,6 +512,254 @@ class TodoControllerSpec {
     assertEquals("The requested Todo was not found", exception.getMessage());
 
   }
+
+  @Test
+  void addTodo() throws IOException {
+    // Create a new user to add
+    Todo newTodo = new Todo();
+    newTodo.owner = "Mr. Swordssmith";
+    newTodo.status = false;
+    newTodo.body = "BEAT THE EVIL DARKLORD!!!";
+    newTodo.category = "homework";
+
+    // Use `javalinJackson` to convert the `User` object to a JSON string representing that user.
+    // This would be equivalent to:
+    //   String testnewTodo = """
+    //       {
+    //         "name": "Test User",
+    //         "age": 25,
+    //         "company": "testers",
+    //         "email": "test@example.com",
+    //         "role": "viewer"
+    //       }
+    //       """;
+    // but using `javalinJackson` to generate the JSON avoids repeating all the field values,
+    // which is then less error prone.
+    String newTodoJson = javalinJackson.toJsonString(newTodo, Todo.class);
+
+    // A `BodyValidator` needs
+    //   - The string (`newTodoJson`) being validated
+    //   - The class (`User.class) it's trying to generate from that string
+    //   - A function (`() -> User`) which "shows" the validator how to convert
+    //     the JSON string to a `User` object. We'll again use `javalinJackson`,
+    //     but in the other direction.
+    when(ctx.bodyValidator(Todo.class))
+      .thenReturn(new BodyValidator<Todo>(newTodoJson, Todo.class,
+                    () -> javalinJackson.fromJsonString(newTodoJson, Todo.class)));
+
+    todoController.addNewTodo(ctx);
+    verify(ctx).json(mapCaptor.capture());
+
+    // Our status should be 201, i.e., our new user was successfully created.
+    verify(ctx).status(HttpStatus.CREATED);
+
+    // Verify that the user was added to the database with the correct ID
+    Document addedTodo = db.getCollection("todos")
+        .find(eq("_id", new ObjectId(mapCaptor.getValue().get("id")))).first();
+
+    // Successfully adding the user should return the newly generated, non-empty
+    // MongoDB ID for that user.
+    assertNotEquals("", addedTodo.get("_id"));
+    // The new user in the database (`addedTodo`) should have the same
+    // field values as the user we asked it to add (`newTodo`).
+    assertEquals(newTodo.owner, addedTodo.get(TodoController.OWNER_KEY));
+    assertEquals(newTodo.status, addedTodo.get(TodoController.STATUS_KEY));
+    assertEquals(newTodo.category, addedTodo.get(TodoController.CATEGORY_KEY));
+    assertEquals(newTodo.body, addedTodo.get(TodoController.BODY_CONTAINS_KEY));
+
+  }
+
+  @Test
+  void AddEmptyCategoryTodo() throws IOException {
+    // Create a new user JSON string to add.
+    // Note that it has a string for the age that can't be parsed to a number.
+    String newTodoJson = """
+      {
+        "owner": "Alm",
+        "category": "Something something reunite Valentia",
+        "status": "false",
+        "body": "IDK chief I forgot the plot of FE SoV",
+      }
+      """;
+
+    when(ctx.body()).thenReturn(newTodoJson);
+    when(ctx.bodyValidator(Todo.class))
+        .thenReturn(new BodyValidator<Todo>(newTodoJson, Todo.class,
+                      () -> javalinJackson.fromJsonString(newTodoJson, Todo.class)));
+
+    // This should now throw a `ValidationException` because
+    // the JSON for our new user has an invalid email address.
+    ValidationException exception = assertThrows(ValidationException.class, () -> {
+      todoController.addNewTodo(ctx);
+    });
+    // This `ValidationException` was caused by a custom check, so we just get the message from the first
+    // error (which is a `"REQUEST_BODY"` error) and convert that to a string with `toString()`. This gives
+    // a `String` that has all the details of the exception, which we can make sure contains information
+    // that would help a developer sort out validation errors.
+    String exceptionMessage = exception.getErrors().get("REQUEST_BODY").get(0).toString();
+
+    // The message should be the message from our code under test, which should also include the text
+    // we tried to parse as an email, namely "notanumber".
+    assertTrue(exceptionMessage.contains("Something something reunite Valentia"));
+  }
+
+  @Test
+  void emptyBodyTodo() throws IOException {
+    // Create a new user JSON string to add.
+    // Note that it has a string for the age that can't be parsed to a number.
+    String newTodoJson = """
+      {
+        "owner": "Alm",
+        "category": "video games",
+        "status": "false",
+        "body": ""
+      }
+      """;
+
+    when(ctx.body()).thenReturn(newTodoJson);
+    when(ctx.bodyValidator(Todo.class))
+        .thenReturn(new BodyValidator<Todo>(newTodoJson, Todo.class,
+                      () -> javalinJackson.fromJsonString(newTodoJson, Todo.class)));
+
+    // This should now throw a `ValidationException` because
+    // the JSON for our new user has an invalid email address.
+    ValidationException exception = assertThrows(ValidationException.class, () -> {
+      todoController.addNewTodo(ctx);
+    });
+    // This `ValidationException` was caused by a custom check, so we just get the message from the first
+    // error (which is a `"REQUEST_BODY"` error) and convert that to a string with `toString()`. This gives
+    // a `String` that has all the details of the exception, which we can make sure contains information
+    // that would help a developer sort out validation errors.
+    String exceptionMessage = exception.getErrors().get("REQUEST_BODY").get(0).toString();
+
+    // The message should be the message from our code under test, which should also include the text
+    // we tried to parse as an email, namely "notanumber".
+
+    assertTrue(exceptionMessage.contains("non-empty description"));
+
+
+  }
+
+  @Test
+  void nullBodyTodo() throws IOException {
+    // Create a new user JSON string to add.
+    // Note that it has a string for the age that can't be parsed to a number.
+    String newTodoJson = """
+      {
+        "owner": "Alm",
+        "category": "video games",
+        "status": "false",
+        "body": null
+      }
+      """;
+
+    when(ctx.body()).thenReturn(newTodoJson);
+    when(ctx.bodyValidator(Todo.class))
+        .thenReturn(new BodyValidator<Todo>(newTodoJson, Todo.class,
+                      () -> javalinJackson.fromJsonString(newTodoJson, Todo.class)));
+
+    // This should now throw a `ValidationException` because
+    // the JSON for our new user has an invalid email address.
+    ValidationException exception = assertThrows(ValidationException.class, () -> {
+      todoController.addNewTodo(ctx);
+    });
+    // This `ValidationException` was caused by a custom check, so we just get the message from the first
+    // error (which is a `"REQUEST_BODY"` error) and convert that to a string with `toString()`. This gives
+    // a `String` that has all the details of the exception, which we can make sure contains information
+    // that would help a developer sort out validation errors.
+    String exceptionMessage = exception.getErrors().get("REQUEST_BODY").get(0).toString();
+
+    // The message should be the message from our code under test, which should also include the text
+    // we tried to parse as an email, namely "notanumber".
+
+    assertTrue(exceptionMessage.contains("non-empty description"));
+
+  }
+
+  @Test
+  void emptyOwnerTodo() throws IOException {
+    // Create a new user JSON string to add.
+    // Note that it has a string for the age that can't be parsed to a number.
+    String newTodoJson = """
+      {
+        "owner": "",
+        "category": "video games",
+        "status": "false",
+        "body": "poato man"
+      }
+      """;
+
+    when(ctx.body()).thenReturn(newTodoJson);
+    when(ctx.bodyValidator(Todo.class))
+        .thenReturn(new BodyValidator<Todo>(newTodoJson, Todo.class,
+                      () -> javalinJackson.fromJsonString(newTodoJson, Todo.class)));
+
+    // This should now throw a `ValidationException` because
+    // the JSON for our new user has an invalid email address.
+    ValidationException exception = assertThrows(ValidationException.class, () -> {
+      todoController.addNewTodo(ctx);
+    });
+    // This `ValidationException` was caused by a custom check, so we just get the message from the first
+    // error (which is a `"REQUEST_BODY"` error) and convert that to a string with `toString()`. This gives
+    // a `String` that has all the details of the exception, which we can make sure contains information
+    // that would help a developer sort out validation errors.
+    String exceptionMessage = exception.getErrors().get("REQUEST_BODY").get(0).toString();
+
+    // The message should be the message from our code under test, which should also include the text
+    // we tried to parse as an email, namely "notanumber".
+
+    assertTrue(exceptionMessage.contains("non-empty owner name"));
+
+
+  }
+
+  @Test
+  void emptyOwnerAndBodyTodo() throws IOException {
+    // Create a new user JSON string to add.
+    // Note that it has a string for the age that can't be parsed to a number.
+    String newTodoJson = """
+      {
+        "owner": "",
+        "category": "video games",
+        "status": "false",
+        "body": ""
+      }
+      """;
+
+    when(ctx.body()).thenReturn(newTodoJson);
+    when(ctx.bodyValidator(Todo.class))
+        .thenReturn(new BodyValidator<Todo>(newTodoJson, Todo.class,
+                      () -> javalinJackson.fromJsonString(newTodoJson, Todo.class)));
+
+    // This should now throw a `ValidationException` because
+    // the JSON for our new user has an invalid email address.
+    ValidationException exception = assertThrows(ValidationException.class, () -> {
+      todoController.addNewTodo(ctx);
+    });
+    // This `ValidationException` was caused by a custom check, so we just get the message from the first
+    // error (which is a `"REQUEST_BODY"` error) and convert that to a string with `toString()`. This gives
+    // a `String` that has all the details of the exception, which we can make sure contains information
+    // that would help a developer sort out validation errors.
+    String exceptionMessage = exception.getErrors().get("REQUEST_BODY").get(0).toString();
+
+    // The message should be the message from our code under test, which should also include the text
+    // we tried to parse as an email, namely "notanumber".
+
+    assertTrue(exceptionMessage.contains("non-empty owner name"));
+
+    exceptionMessage = exception.getErrors().get("REQUEST_BODY").get(1).toString();
+
+    // The message should be the message from our code under test, which should also include the text
+    // we tried to parse as an email, namely "notanumber".
+
+    assertTrue(exceptionMessage.contains("non-empty description"));
+
+
+
+
+  }
+
+
 
 
 }
