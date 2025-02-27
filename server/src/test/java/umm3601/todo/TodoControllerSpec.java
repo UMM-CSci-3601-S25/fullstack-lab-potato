@@ -567,7 +567,7 @@ class TodoControllerSpec {
   }
 
   @Test
-  void AddEmptyCategoryTodo() throws IOException {
+  void addEmptyCategoryTodo() throws IOException {
     // Create a new user JSON string to add.
     // Note that it has a string for the age that can't be parsed to a number.
     String newTodoJson = """
