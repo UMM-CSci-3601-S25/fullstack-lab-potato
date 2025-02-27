@@ -13,7 +13,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,7 +23,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import static com.mongodb.client.model.Filters.eq;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -47,7 +45,6 @@ import io.javalin.validation.ValidationException;
 import io.javalin.validation.Validator;
 import umm3601.todos.Todo;
 import umm3601.todos.TodoController;
-import umm3601.user.UserController;
 
 /**
  * Tests the logic of the UserController
