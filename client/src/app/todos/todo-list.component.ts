@@ -7,6 +7,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TodoService } from './todo.service';
 import { Todo } from './todo';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-todo-list',
@@ -16,7 +21,12 @@ import { MatOption, MatSelect } from '@angular/material/select';
     MatInputModule,
     FormsModule,
     MatSelect,
-    MatOption
+    MatOption,
+    MatIconModule,
+    MatTooltipModule,
+    MatRadioModule,
+    MatButtonModule,
+    RouterLink,
   ],
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.scss'

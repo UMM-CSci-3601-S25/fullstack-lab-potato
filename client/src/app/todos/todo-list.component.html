@@ -67,7 +67,7 @@
   } @else {
     <div class="flex-1" class="todo-error">
       <mat-error>
-        There was a problem loading the users. Possibly the server is down or perhaps there are network
+        There was a problem loading the todos. Possibly the server is down or perhaps there are network
         issues.
       </mat-error>
       <mat-error>
@@ -76,3 +76,6 @@
     </div>
   }
 </div>
+<button mat-fab class="add-todo-fab" matTooltip="Add Todo" matTooltipPosition="left" routerLink="/todos/new" data-test="addTodoButton">
+  <mat-icon class="md-24" aria-label="Add Todo">add</mat-icon>
+</button>
